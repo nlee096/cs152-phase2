@@ -1,6 +1,8 @@
    /* cs152-miniL phase2 */
    
 %{   
+	#include <string.h>
+	#include "miniL-parser.h"
 	int currline = 1;
 	int currpos = 1;
 %}
@@ -16,70 +18,71 @@ INVALIDEND	[A-Za-z][A-Za-z0-9_]*_
 %%
    /* specific lexer rules in regex */
 "function"	{currpos += yyleng; return FUNCTION;}
-"beginparams"	{currpos += yyleng; return BEGINPARAMS}
-"endparams"	{currpos += yyleng; return ENDPARAMS}
-"beginlocals"	{currpos += yyleng; return BEGINLOCALS}
-"endlocals"	{currpost += yyleng; return END_LOCALS;}
-"beginbody"	{currpost += yyleng; return BEGIN_BODY;}
-"endbody"	{currpost += yyleng; return END_BODY;}
-"integer"	{currpost += yyleng; return INTEGER;}
-"array"		{currpost += yyleng; return ARRAY;}
-"of"		{currpost += yyleng; return OF;}
-"if"		{currpost += yyleng; return IF;}
-"then"		{currpost += yyleng; return THEN;}
-"endif"		{currpost += yyleng; return ENDIF;}
-"else"		{currpost += yyleng; return ELSE;}
-"while"		{currpost += yyleng; return WHILE;}
-"do"		{currpost += yyleng; return DO;}
-"for"		{currpost += yyleng; return FOR;}
-"beginloop"	{currpost += yyleng; return BEGINLOOP;}
-"endloop"	{currpost += yyleng; return ENDLOOP;}
-"continue"	{currpost += yyleng; return CONTINUE;}
-"break"		{currpost += yyleng; return BREAK;}
-"read"		{currpost += yyleng; return READ;}
-"write"		{currpost += yyleng; return WRITE;}
-"not"		{currpost += yyleng; return NOT;}
-"and"		{currpost += yyleng; return AND;}
-"or"		{currpost += yyleng; return OR;}
-"true"		{currpost += yyleng; return TRUE;}
-"false"		{currpost += yyleng; return FALSE;}
-"return"	{currpost += yyleng; return RETURN;}
-"-"		{currpost += yyleng; return SUB;}
-"+"		{currpost += yyleng; return ADD;}
-"*"		{currpost += yyleng; return MULT;}
-"/"		{currpost += yyleng; return DIV;}
-"%"		{currpost += yyleng; return MOD;}
-"=="		{currpost += yyleng; return EQ;}
-"<>"		{currpost += yyleng; return NEQ;}
-"<"		{currpost += yyleng; return LT;}
-"<="		{currpost += yyleng; return LTE;}
-">"		{currpost += yyleng; return GT;}
-">="		{currpost += yyleng; return GTE;}
-";"		{currpost += yyleng; return SEMICOLON;}
-":"		{currpost += yyleng; return COLON;}
-","		{currpost += yyleng; return COMMA;}
-";"		{currpost += yyleng; return SEMICOLON;}
-":"		{currpost += yyleng; return COLON;}
-","		{currpost += yyleng; return COMMA;}
-"("		{currpost += yyleng; return L_PAREN;}
-")"		{currpost += yyleng; return R_PAREN;}
-"["		{currpost += yyleng; return L_SQUARE_BRACKET;}
-"]"		{currpost += yyleng; return R_SQUARE_BRACKET;}
-":="		{currpost += yyleng; return ASSIGN;}
+"beginparams"	{currpos += yyleng; return BEGIN_PARAMS;}
+"endparams"	{currpos += yyleng; return END_PARAMS;}
+"beginlocals"	{currpos += yyleng; return BEGIN_LOCALS;}
+"endlocals"	{currpos += yyleng; return END_LOCALS;}
+"beginbody"	{currpos += yyleng; return BEGIN_BODY;}
+"endbody"	{currpos += yyleng; return END_BODY;}
+"integer"	{currpos += yyleng; return INTEGER;}
+"array"		{currpos += yyleng; return ARRAY;}
+"of"		{currpos += yyleng; return OF;}
+"if"		{currpos += yyleng; return IF;}
+"then"		{currpos += yyleng; return THEN;}
+"endif"		{currpos += yyleng; return ENDIF;}
+"else"		{currpos += yyleng; return ELSE;}
+"while"		{currpos += yyleng; return WHILE;}
+"do"		{currpos += yyleng; return DO;}
+"for"		{currpos += yyleng; return FOR;}
+"beginloop"	{currpos += yyleng; return BEGINLOOP;}
+"endloop"	{currpos += yyleng; return ENDLOOP;}
+"continue"	{currpos += yyleng; return CONTINUE;}
+"break"		{currpos += yyleng; return BREAK;}
+"read"		{currpos += yyleng; return READ;}
+"write"		{currpos += yyleng; return WRITE;}
+"not"		{currpos += yyleng; return NOT;}
+"and"		{currpos += yyleng; return AND;}
+"or"		{currpos += yyleng; return OR;}
+"true"		{currpos += yyleng; return TRUE;}
+"false"		{currpos += yyleng; return FALSE;}
+"return"	{currpos += yyleng; return RETURN;}
+"-"		{currpos += yyleng; return SUB;}
+"+"		{currpos += yyleng; return ADD;}
+"*"		{currpos += yyleng; return MULT;}
+"/"		{currpos += yyleng; return DIV;}
+"%"		{currpos += yyleng; return MOD;}
+"=="		{currpos += yyleng; return EQ;}
+"<>"		{currpos += yyleng; return NEQ;}
+"<"		{currpos += yyleng; return LT;}
+">"		{currpos += yyleng; return GT;}
+"<="            {currpos += yyleng; return LTE;}
+">="		{currpos += yyleng; return GTE;}
+";"		{currpos += yyleng; return SEMICOLON;}
+":"		{currpos += yyleng; return COLON;}
+","		{currpos += yyleng; return COMMA;}
+";"		{currpos += yyleng; return SEMICOLON;}
+":"		{currpos += yyleng; return COLON;}
+","		{currpos += yyleng; return COMMA;}
+"("		{currpos += yyleng; return L_PAREN;}
+")"		{currpos += yyleng; return R_PAREN;}
+"["		{currpos += yyleng; return L_SQUARE_BRACKET;}
+"]"		{currpos += yyleng; return R_SQUARE_BRACKET;}
+":="		{currpos += yyleng; return ASSIGN;}
 
-{DIGIT}+        {/*special case*/ printf("NUMBER %s\n", yytext); currpos += yyleng;}
+{DIGIT}+        {currpos += yyleng; yylval.ival = atoi(yytext); return NUMBER;}
 [ \t]+		{currpos += yyleng;}
 "\n"		{currline += 1;}		
 (##).* 		{currline++; currpos = 1;}
 
 {INVALIDSTART}	{printf("Error at line %d, column %d: identifier \"%s\" must begin with a letter\n" , currline, currpos, yytext); exit(0);} 
 {INVALIDEND}	{printf("Error at line %d, column %d: identifier \"%s\" cannot end with an underscore\n" , currline, currpos, yytext); exit(0);}
-{VALIDID} 	{/* special case*/ printf("IDENT %s\n", yytext); currpos += yyleng;}
+{VALIDID} 	{currpos += yyleng; yylval.sval = yytext; return IDENT;}
 . 		{printf("Error at line %d. column %d: unrecognized symbol \"%s\"\n", currline, currpos, yytext); exit(0);}
 %%
 	/* C functions used in lexer */
-
+/*
 int main(int argc, char ** argv)
 {
    yylex();
 }
+*/
