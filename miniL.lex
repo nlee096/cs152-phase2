@@ -71,12 +71,12 @@ INVALIDEND	[A-Za-z][A-Za-z0-9_]*_
 
 {DIGIT}+        {currpos += yyleng; yylval.ival = atoi(yytext); return NUMBER;}
 [ \t]+		{currpos += yyleng;}
-"\n"		{currline += 1;}		
+"\n"		{currpos = 1; currline += 1;}		
 (##).* 		{currline++; currpos = 1;}
 
 {INVALIDSTART}	{printf("Error at line %d, column %d: identifier \"%s\" must begin with a letter\n" , currline, currpos, yytext); exit(0);} 
 {INVALIDEND}	{printf("Error at line %d, column %d: identifier \"%s\" cannot end with an underscore\n" , currline, currpos, yytext); exit(0);}
-{VALIDID} 	{currpos += yyleng; yylval.sval = yytext; return IDENT;}
+{VALIDID} 	{yyless(yyleng); currpos += yyleng; yylval.sval = yytext; return IDENT;}
 . 		{printf("Error at line %d. column %d: unrecognized symbol \"%s\"\n", currline, currpos, yytext); exit(0);}
 %%
 	/* C functions used in lexer */

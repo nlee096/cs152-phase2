@@ -85,12 +85,11 @@ functions: function functions {printf("functions -> function functions\n");}
 ;
 
 function: FUNCTION ident SEMICOLON BEGIN_PARAMS declarations END_PARAMS BEGIN_LOCALS declarations END_LOCALS BEGIN_BODY statements END_BODY
-        {printf("functions -> FUNCTION IDENT SEMICOLON BEGIN_PARAMS declarations END_PARAMS BEGIN_LOCALS declarations END_LOCALS BEGIN_BODY statements END_BODY\n");}
+        {printf("functions -> FUNCTION ident SEMICOLON BEGIN_PARAMS declarations END_PARAMS BEGIN_LOCALS declarations END_LOCALS BEGIN_BODY statements END_BODY\n");}
 ;
 
-identifiers: ident {printf("identifiers -> ident\n");
-	// |ident COMMA identifiers{printf("identifiers -> ident COMMA identifiers\n");}
-	}
+identifiers: ident {printf("identifiers -> ident\n");}
+	|ident COMMA identifiers{printf("identifiers -> ident COMMA identifiers\n");}
 ;
 
 ident: IDENT {printf("ident -> IDENT %s\n", $1);}
@@ -151,11 +150,11 @@ comp: EQ {printf("comp -> EQ\n");}
 term: var {printf("term -> var\n");}
 	| NUMBER {printf("term -> NUMBER %d\n", $1);}
 	| L_PAREN expression R_PAREN {printf("term -> L_PAREN expression R_PAREN\n");}
-	| IDENT L_PAREN expressions R_PAREN {printf("term -> IDENT %s L_PAREN expressions R_PAREN\n", $1);}
+	| ident L_PAREN expressions R_PAREN {printf("term -> ident L_PAREN expressions R_PAREN\n");}
 ;
 
-var: IDENT {printf("var -> IDENT %s \n", $1);}
-	| IDENT L_SQUARE_BRACKET expression R_SQUARE_BRACKET {printf("var -> IDENT L_SQUARE_BRACKET expression R_SQUARE_BRACKET\n");}
+var: ident {printf("var -> ident\n");}
+	| ident L_SQUARE_BRACKET expression R_SQUARE_BRACKET {printf("var -> ident L_SQUARE_BRACKET expression R_SQUARE_BRACKET\n");}
 ;
 
 var_loop: COMMA var var_loop {printf("var_loop -> COMMA var var_loop\n");}
@@ -170,6 +169,6 @@ int main(int argc, char **argv) {
 
 void yyerror(const char *msg) {
     /* implement your error handling */
-   printf("Syntax error at line %d, column %d: %s \n", currline, currpos, msg);
-   //exit(1);
+   printf("** %s at line %d, column %d\n", msg, currline, currpos);
+   exit(1);
 }
